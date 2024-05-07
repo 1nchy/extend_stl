@@ -105,17 +105,16 @@ template <typename _Value, typename _Alloc> struct hash_table_alloc : public _Al
     typedef hash_node<_Value> node_type;
     typedef typename node_type::value_type value_type;
     typedef typename node_type::bucket_type bucket_type;
-    typedef _Alloc elt_allocator_type;
-    typedef std::allocator_traits<elt_allocator_type> elt_alloc_traits;
-    typedef typename elt_alloc_traits::template rebind_alloc<node_type> node_allocator_type;
+    typedef std::allocator_traits<_Alloc> alloc_traits;
+    typedef typename alloc_traits::template rebind_alloc<node_type> node_allocator_type;
     typedef std::allocator_traits<node_allocator_type> node_alloc_traits;
-    typedef typename elt_alloc_traits::template rebind_alloc<bucket_type> bucket_allocator_type;
+    typedef typename alloc_traits::template rebind_alloc<bucket_type> bucket_allocator_type;
     typedef std::allocator_traits<bucket_allocator_type> bucket_alloc_traits;
 
-    elt_allocator_type& _M_get_elt_allocator() { return *static_cast<elt_allocator_type*>(this); }
-    const elt_allocator_type& _M_get_elt_allocator() const { return *static_cast<const elt_allocator_type*>(this); }
-    node_allocator_type _M_get_node_allocator() const { return node_allocator_type(_M_get_elt_allocator()); }
-    bucket_allocator_type _M_get_bucket_allocator() const { return bucket_allocator_type(_M_get_elt_allocator()); }
+    _Alloc& _M_get_allocator() { return *static_cast<_Alloc*>(this); }
+    const _Alloc& _M_get_allocator() const { return *static_cast<const _Alloc*>(this); }
+    node_allocator_type _M_get_node_allocator() const { return node_allocator_type(_M_get_allocator()); }
+    bucket_allocator_type _M_get_bucket_allocator() const { return bucket_allocator_type(_M_get_allocator()); }
 
     node_type* _M_allocate_node(const node_type& _x) {
         node_allocator_type _node_alloc = _M_get_node_allocator();

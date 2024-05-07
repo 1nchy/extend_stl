@@ -253,8 +253,6 @@ public:
     typedef hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc> self;
     typedef hash_table_alloc<_Value, _Alloc> base;
     typedef hash_table_alloc<_Value, _Alloc> ht_alloc;
-    typedef typename base::elt_allocator_type elt_allocator_type;
-    typedef typename base::elt_alloc_traits elt_alloc_traits;
     typedef typename base::node_allocator_type node_allocator_type;
     typedef typename base::node_alloc_traits node_alloc_traits;
     typedef typename base::bucket_allocator_type bucket_allocator_type;
