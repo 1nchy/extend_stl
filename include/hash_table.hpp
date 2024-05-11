@@ -980,7 +980,7 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::contain
     };
     const bucket_index _bi = this->_M_index_in_bucket(_c);
     const bucket_index _rbi = this->_M_index_in_rehash_bucket(_c);
-    return existed_in_given_bucket(_bi) | existed_in_given_bucket(_rbi);
+    return existed_in_given_bucket(_bi) || existed_in_given_bucket(_rbi);
 };
 template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
 hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::clear()
