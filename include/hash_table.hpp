@@ -21,10 +21,10 @@
 #include <type_traits>
 
 namespace icy {
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, bool _Constant, typename _Hash = std::hash<_Key>, typename _Alloc = std::allocator<_Value>> struct hash_node_iterator;
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash = std::hash<_Key>, typename _Alloc = std::allocator<_Value>> struct hash_iterator;
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash = std::hash<_Key>, typename _Alloc = std::allocator<_Value>> struct hash_const_iterator;
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash = std::hash<_Key>, typename _Alloc = std::allocator<_Value>> class hash_table;
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, bool _Constant, typename _Hash = std::hash<_Key>, typename _Alloc = std::allocator<_Value>> struct hash_node_iterator;
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash = std::hash<_Key>, typename _Alloc = std::allocator<_Value>> struct hash_iterator;
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash = std::hash<_Key>, typename _Alloc = std::allocator<_Value>> struct hash_const_iterator;
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash = std::hash<_Key>, typename _Alloc = std::allocator<_Value>> class hash_table;
 
 
 namespace kv {
@@ -60,7 +60,7 @@ struct _select_1x_ref {
     }
 };
 
-template <typename _Key, typename _Value, bool _UniqueKey, typename _ExtValue> struct type_traits {
+template <typename _Key, typename _Value, typename _ExtValue> struct type_traits {
     typedef std::decay_t<_Key> key_type;
     typedef std::decay_t<_Value> value_type;
     typedef std::result_of_t<_ExtValue(_Value)> mapped_type;
@@ -68,12 +68,12 @@ template <typename _Key, typename _Value, bool _UniqueKey, typename _ExtValue> s
 }
 
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, bool _Constant, typename _Hash, typename _Alloc>
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, bool _Constant, typename _Hash, typename _Alloc>
 struct hash_node_iterator {
     typedef icy::forward_iterator_tag iterator_category;
-    typedef hash_node_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Constant, _Hash, _Alloc> self;
+    typedef hash_node_iterator<_Key, _Value, _ExtKey, _UniqueKey, _Constant, _Hash, _Alloc> self;
 
-    typedef hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc> _hash_table;
+    typedef hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc> _hash_table;
 
     typedef typename _hash_table::node_type node_type;
     typedef typename _hash_table::value_type value_type;
@@ -139,19 +139,19 @@ struct hash_node_iterator {
     bool _M_bucket_end() const {
         return _ht->_M_end_of_bucket(_cur);
     }
-    template <typename _K, typename _V, typename _EK, bool _UK, typename _EV, typename _H, typename _A>
-     friend std::ostream& operator<<(std::ostream& os, const hash_table<_K, _V, _EK, _UK, _EV, _H, _A>& _h);
+    // template <typename _K, typename _V, typename _EK, bool _UK, typename _H, typename _A>
+    //  friend std::ostream& operator<<(std::ostream& os, const hash_table<_K, _V, _EK, _UK, _H, _A>& _h);
 
-    template <typename _K, typename _V, typename _EK, bool _UK, typename _EV, bool _C, typename _H, typename _A>
-     friend std::ostream& operator<<(std::ostream& os, const hash_node_iterator<_K, _V, _EK, _UK, _EV, _C, _H, _A>& _h);
+    // template <typename _K, typename _V, typename _EK, bool _UK, bool _C, typename _H, typename _A>
+    //  friend std::ostream& operator<<(std::ostream& os, const hash_node_iterator<_K, _V, _EK, _UK, _C, _H, _A>& _h);
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc>
-struct hash_iterator : public hash_node_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, false, _Hash, _Alloc> {
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc>
+struct hash_iterator : public hash_node_iterator<_Key, _Value, _ExtKey, _UniqueKey, false, _Hash, _Alloc> {
     typedef icy::forward_iterator_tag iterator_category;
-    typedef hash_node_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, false, _Hash, _Alloc> base;
-    typedef hash_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc> self;
-    typedef hash_const_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc> iterator;
+    typedef hash_node_iterator<_Key, _Value, _ExtKey, _UniqueKey, false, _Hash, _Alloc> base;
+    typedef hash_iterator<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc> self;
+    typedef hash_const_iterator<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc> iterator;
 
     typedef typename base::_node_type node_type;
     typedef typename base::_hash_table _hash_table;
@@ -169,12 +169,12 @@ struct hash_iterator : public hash_node_iterator<_Key, _Value, _ExtKey, _UniqueK
     }
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc>
-struct hash_const_iterator : public hash_node_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, true, _Hash, _Alloc> {
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc>
+struct hash_const_iterator : public hash_node_iterator<_Key, _Value, _ExtKey, _UniqueKey, true, _Hash, _Alloc> {
     typedef icy::forward_iterator_tag iterator_category;
-    typedef hash_node_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, true, _Hash, _Alloc> base;
-    typedef hash_const_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc> self;
-    typedef hash_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc> iterator;
+    typedef hash_node_iterator<_Key, _Value, _ExtKey, _UniqueKey, true, _Hash, _Alloc> base;
+    typedef hash_const_iterator<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc> self;
+    typedef hash_iterator<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc> iterator;
 
     typedef typename base::_node_type node_type;
     typedef typename base::_hash_table _hash_table;
@@ -201,7 +201,6 @@ struct hash_const_iterator : public hash_node_iterator<_Key, _Value, _ExtKey, _U
  * @tparam _Value 键与值（包含了键与值的类，实际存储的对象）
  * @tparam _ExtKey 从键与值中获取键的类（需要重载括号运算符）
  * @tparam _UniqueKey 键是否唯一
- * @tparam _ExtValue 从键与值中获取值的部分（需要重载括号运算符）
  * @tparam _Hash 哈希方法
  * @tparam _Alloc 内存分配器
  * @details
@@ -247,10 +246,10 @@ struct hash_const_iterator : public hash_node_iterator<_Key, _Value, _ExtKey, _U
  *    节点链表与普通的节点插入一致。
  *    _rehash_process 会遍历完整个 _bucket 之后，回到 _mark 节点。
 */
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc>
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc>
 class hash_table : public hash_table_alloc<_Value, _Alloc> {
 public:
-    typedef hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc> self;
+    typedef hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc> self;
     typedef hash_table_alloc<_Value, _Alloc> base;
     typedef hash_table_alloc<_Value, _Alloc> ht_alloc;
     typedef typename base::node_allocator_type node_allocator_type;
@@ -258,7 +257,7 @@ public:
     typedef typename base::bucket_allocator_type bucket_allocator_type;
     typedef typename base::bucket_alloc_traits bucket_alloc_traits;
     typedef _ExtKey ext_key;
-    typedef _ExtValue ext_value;
+    // typedef _ExtValue ext_value;
 
     typedef _Key key_type;
     typedef typename base::node_type node_type;
@@ -267,14 +266,14 @@ public:
     typedef typename node_type::hash_code hash_code;
     typedef _Hash hasher;
 
-    typedef hash_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc> iterator;
-    typedef hash_const_iterator<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc> const_iterator;
+    typedef hash_iterator<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc> iterator;
+    typedef hash_const_iterator<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc> const_iterator;
 
     typedef std::conditional_t<_UniqueKey, std::pair<iterator, bool>, iterator> ireturn_type;
 
-    typedef kv::type_traits<key_type, value_type, _UniqueKey, _ExtValue> _ContainerTypeTraits;
+    // typedef kv::type_traits<key_type, value_type, _ExtValue> _ContainerTypeTraits;
 
-    typedef typename _ContainerTypeTraits::mapped_type mapped_type;
+    // typedef typename _ContainerTypeTraits::mapped_type mapped_type;
 
     typedef rehash_policy::bucket_index bucket_index;
     typedef rehash_policy::bucket_id bucket_id;
@@ -291,12 +290,12 @@ public:
     mutable node_type _mark; // _mark like in list
 
     _ExtKey _extract_key;
-    _ExtValue _extract_value;
+    // _ExtValue _extract_value;
 
     // template <typename _K, typename _V, typename _EK, bool _UK, typename _EV, typename _H, typename _A>
     //  friend std::ostream& operator<<(std::ostream& os, const hash_table<_K, _V, _EK, _UK, _EV, _H, _A>& _h);
 
-    template <typename _K, typename _V, typename _EK, bool _UK, typename _EV, bool _C, typename _H, typename _A>
+    template <typename _K, typename _V, typename _EK, bool _UK, bool _C, typename _H, typename _A>
      friend struct hash_node_iterator;
 
 public:
@@ -322,9 +321,9 @@ public:
     void clear();
     ireturn_type insert(const value_type& _v);
     size_t erase(const key_type& _k);
-    mapped_type& operator[](const key_type& _k);
-    mapped_type& at(const key_type& _k);
-    const mapped_type& at(const key_type& _k) const;
+    value_type& operator[](const key_type& _k);
+    value_type& at(const key_type& _k);
+    const value_type& at(const key_type& _k) const;
     iterator update(const value_type& _v);
     hash_code _M_hash_code(const key_type& _k) const { return _Hash()(_k); }
 
@@ -428,24 +427,24 @@ protected:
     virtual void _M_rehash_if_required();
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc>
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::hash_table() {
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc>
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::hash_table() {
     size_t _s = _prime_list[0];
     this->_buckets = this->_M_allocate_buckets(_s);
     this->_bucket_count = _s;
     this->_M_init_mark();
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc>
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::hash_table(bool _rehash_enabled) : _rehash_policy(_rehash_enabled) {
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc>
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::hash_table(bool _rehash_enabled) : _rehash_policy(_rehash_enabled) {
     size_t _s = _prime_list[0];
     this->_buckets = this->_M_allocate_buckets(_s);
     this->_bucket_count = _s;
     this->_M_init_mark();
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc>
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::hash_table(const self& _ht)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc>
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::hash_table(const self& _ht)
 : base(_ht), _buckets(nullptr), _bucket_count(_ht._bucket_count)
 , _rehash_buckets(nullptr), _rehash_bucket_count(_ht._rehash_bucket_count)
 , _element_count(_ht._element_count), _rehash_policy(_ht._rehash_policy), _extract_key(_ht._extract_key) {
@@ -455,8 +454,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::hash_ta
     });
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::operator=(const self& _r)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::operator=(const self& _r)
 -> self& {
     if (&_r == this) return *this;
     clear();
@@ -470,17 +469,17 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::operato
     return *this;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc>
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::~hash_table() {
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc>
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::~hash_table() {
     clear();
     this->_M_deallocate_buckets();
     _buckets = nullptr; _bucket_count = 0;
     _rehash_buckets = nullptr; _rehash_bucket_count = 0;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc>
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc>
 template <typename _NodeGen> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::
 _M_assign(const self& _ht, const _NodeGen& _gen) -> void {
     bucket_type* _t_buckets = nullptr;
     bucket_type* _t_rehash_buckets = nullptr;
@@ -506,8 +505,8 @@ _M_assign(const self& _ht, const _NodeGen& _gen) -> void {
     }
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_in_bucket(const node_type* const _p, const bucket_index& _i) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_in_bucket(const node_type* const _p, const bucket_index& _i) const
 -> bool {
     if (_p == _M_end() || _p == nullptr) return false;
     const key_type& _k = this->_extract_key(_p->val());
@@ -520,8 +519,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_in_b
         return _M_index_in_rehash_bucket(_c) == _i;
     }
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_end_of_bucket(const node_type* const _p, const bucket_index& _i) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_end_of_bucket(const node_type* const _p, const bucket_index& _i) const
 -> bool {
     if (_p == _M_end() || _p == nullptr || _i.first == -1) return true;
     if (_p->_next == _M_end()) return true;
@@ -541,8 +540,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_end_
         return false;
     }
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_end_of_bucket(const node_type* const _p) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_end_of_bucket(const node_type* const _p) const
 -> bool {
     if (_p == _M_end() || _p == nullptr) return true;
     if (_p->_next == _M_end()) return true;
@@ -555,8 +554,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_end_
     return false;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_valid_bucket_index(const bucket_index& _i) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_valid_bucket_index(const bucket_index& _i) const
 -> bool {
     if (_i.first == 0) {
         return _i.second >= 0 && _i.second < this->_bucket_count;
@@ -567,8 +566,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_vali
     return false;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_find_node(const key_type& _k, const hash_code& _c) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_find_node(const key_type& _k, const hash_code& _c) const
 -> std::pair<bucket_index, node_type*> {
     // search in %_bucket first, and %_rehash_bucket if in rehash
     const bucket_index _i = _M_index_in_bucket(_c);
@@ -585,8 +584,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_find
     }
     return std::make_pair(_s_illegal_index, nullptr);
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_find_node_in_bucket(const key_type& _k, const hash_code& _c) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_find_node_in_bucket(const key_type& _k, const hash_code& _c) const
 -> std::pair<bucket_index, node_type*> {
     // search in %_bucket first, and %_rehash_bucket if in rehash
     const bucket_index _i = _M_index_in_bucket(_c);
@@ -596,8 +595,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_find
     }
     return std::make_pair(_s_illegal_index, nullptr);
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_find_insertion_node(const key_type& _k, const hash_code& _c) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_find_insertion_node(const key_type& _k, const hash_code& _c) const
 -> std::pair<bucket_index, node_type*> {
     const bucket_index _i = _M_in_rehash() ?
         _M_index_in_rehash_bucket(_c) :
@@ -607,14 +606,14 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_find
     return std::make_pair(_i, _n);
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_find_head_node(const key_type& _k, const node_type* const _p) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_find_head_node(const key_type& _k, const node_type* const _p) const
 -> bucket_index {
     return _M_find_head_node(this->_M_hash_code(_k), _p);
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_find_head_node(const hash_code& _c, const node_type* const _p) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_find_head_node(const hash_code& _c, const node_type* const _p) const
 -> bucket_index {
     if (_M_in_rehash()) {
         const bucket_index _i = _M_index_in_rehash_bucket(_c);
@@ -625,8 +624,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_find
     return _s_illegal_index;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_bucket(const bucket_index& _i) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_bucket(const bucket_index& _i) const
 -> bucket_type {
     if (!_M_valid_bucket_index(_i)) {
         return nullptr;
@@ -640,8 +639,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_buck
     return nullptr;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_bucket_ref(const bucket_index& _i) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_bucket_ref(const bucket_index& _i) const
 -> bucket_type& {
     if (_i.first == 1) {
         return this->_rehash_buckets[_i.second];
@@ -649,8 +648,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_buck
     return this->_buckets[_i.second];
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::
 _M_find_node_in_given_bucket(const bucket_index& _i, const key_type& _k, hash_code _c) const
 -> node_type* {
     node_type* _p = this->_M_bucket(_i);
@@ -664,8 +663,8 @@ _M_find_node_in_given_bucket(const bucket_index& _i, const key_type& _k, hash_co
     }
     return nullptr;
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::
 _M_given_node_in_given_bucket(const bucket_index& _i, const node_type* const _x) const
 -> bool {
     node_type* _p = this->_M_bucket(_i);
@@ -681,8 +680,8 @@ _M_given_node_in_given_bucket(const bucket_index& _i, const node_type* const _x)
 };
 
 /// unguard function, recommend to use only in rehash
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_valid_bucket_index_unguard(const bucket_index& _i) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_valid_bucket_index_unguard(const bucket_index& _i) const
 -> bool {
     if (_i.first == 0) {
         return _i.second >= 0 && _i.second < this->_bucket_count;
@@ -692,8 +691,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_vali
     }
     return false;
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_bucket_unguard(const bucket_index& _i) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_bucket_unguard(const bucket_index& _i) const
 -> bucket_type {
     if (!_M_valid_bucket_index_unguard(_i)) {
         return nullptr;
@@ -706,8 +705,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_buck
     }
     return nullptr;
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::
 _M_find_node_in_given_bucket_unguard(const bucket_index& _i, const key_type& _k, hash_code _c) const
 -> node_type* {
     node_type* _p = this->_M_bucket_unguard(_i);
@@ -721,8 +720,8 @@ _M_find_node_in_given_bucket_unguard(const bucket_index& _i, const key_type& _k,
     }
     return nullptr;
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::
 _M_given_node_in_given_bucket_unguard(const bucket_index& _i, const node_type* const _x) const
 -> bool {
     node_type* _p = this->_M_bucket_unguard(_i);
@@ -737,16 +736,16 @@ _M_given_node_in_given_bucket_unguard(const bucket_index& _i, const node_type* c
     return false;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_hook_node(node_type* const _p, node_type* const _n) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_hook_node(node_type* const _p, node_type* const _n) const
 -> void {
     _n->_next = _p->_next;
     _n->_prev = _p;
     _p->_next->_prev = _n;
     _p->_next = _n;
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_unhook_node(node_type* const _n) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_unhook_node(node_type* const _n) const
 -> void {
     assert(_n != _M_end());
     node_type* const _p = _n->_prev; assert(_p != _n);
@@ -754,16 +753,16 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_unho
     _p->_next->_prev = _p;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::
 _M_insert_null_bucket(const bucket_index& _i, node_type* _n)
 -> void {
     _M_hook_node(&_mark, _n);
     this->_M_bucket_ref(_i) = _n;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::
 _M_insert_bucket_begin(const bucket_index& _i, node_type* _n)
 -> void {
     node_type* _hint = this->_M_bucket(_i);
@@ -772,8 +771,8 @@ _M_insert_bucket_begin(const bucket_index& _i, node_type* _n)
     this->_M_bucket_ref(_i) = _n;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::
 _M_insert_unique_node(const bucket_index& _i, node_type* _p, hash_code _c, node_type* _n)
 -> iterator {
     // _p == nullptr
@@ -787,8 +786,8 @@ _M_insert_unique_node(const bucket_index& _i, node_type* _p, hash_code _c, node_
     return iterator(_n, this);
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::
 _M_insert_multi_node(const bucket_index& _i, node_type* _p, hash_code _c, node_type* _n)
 -> iterator {
     _n->_hash_code = _c;
@@ -805,8 +804,8 @@ _M_insert_multi_node(const bucket_index& _i, node_type* _p, hash_code _c, node_t
     return iterator(_n, this);
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_insert_unique(const bucket_index& _i, node_type* _p, hash_code _c, const value_type& _v)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_insert_unique(const bucket_index& _i, node_type* _p, hash_code _c, const value_type& _v)
 -> iterator {
     // _p == nullptr
     node_type* _n = this->_M_allocate_node(_v);
@@ -814,16 +813,16 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_inse
     return _M_insert_unique_node(_i, _p, _c, _n);
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_insert_multi(const bucket_index& _i, node_type* _p, hash_code _c, const value_type& _v)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_insert_multi(const bucket_index& _i, node_type* _p, hash_code _c, const value_type& _v)
 -> iterator {
     node_type* _n = this->_M_allocate_node(_v);
     ++_element_count;
     return _M_insert_multi_node(_i, _p, _c, _n);
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_insert(const value_type& _v, std::true_type)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_insert(const value_type& _v, std::true_type)
 -> std::pair<iterator, bool> {
     const key_type _k = this->_extract_key(_v);
     const hash_code _c = this->_M_hash_code(_k);
@@ -838,8 +837,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_inse
     return {this->_M_insert_unique(_ipr.first, _ipr.second, _c, _v), true};
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_insert(const value_type& _v, std::false_type)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_insert(const value_type& _v, std::false_type)
 -> iterator {
     const key_type _k = this->_extract_key(_v);
     const hash_code _c = this->_M_hash_code(_k);
@@ -847,8 +846,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_inse
     return this->_M_insert_multi(_p.first, _p.second, _c, _v);
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_erase(const key_type& _k, std::true_type)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_erase(const key_type& _k, std::true_type)
 -> size_t {
     const hash_code _c = this->_M_hash_code(_k);
     const auto _pr = this->_M_find_node(_k, _c);
@@ -874,8 +873,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_eras
     return 1;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_erase(const key_type& _k, std::false_type)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_erase(const key_type& _k, std::false_type)
 -> size_t {
     // node to be erased may exist in both bucket
     const hash_code _c = this->_M_hash_code(_k);
@@ -914,21 +913,21 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_eras
     return _remove_cnt;
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_update(const value_type& _v, std::true_type)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_update(const value_type& _v, std::true_type)
 -> iterator {
     _M_erase(_extract_key(_v), std::true_type());
     return this->_M_insert(_v, std::true_type());
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_update(const value_type& _v, std::false_type)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_update(const value_type& _v, std::false_type)
 -> iterator {
     return this->_M_insert(_v, std::false_type());
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::find(const key_type& _k)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::find(const key_type& _k)
 -> iterator {
     this->_M_rehash_if_required();
 
@@ -937,16 +936,16 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::find(co
     if (_p == nullptr) _p = _M_end();
     return iterator(_p, this);
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::find(const key_type& _k) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::find(const key_type& _k) const
 -> const_iterator {
     hash_code _c = this->_M_hash_code(_k);
     node_type* _p = this->_M_find_node(_k, _c).second;
     if (_p == nullptr) _p = _M_end();
     return const_iterator(_p, this);
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::count(const key_type& _k) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::count(const key_type& _k) const
 -> size_t {
     hash_code _c = this->_M_hash_code(_k);
     auto count_in_given_bucket = [&](const bucket_index& _i) -> size_t {
@@ -969,8 +968,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::count(c
     _cnt += count_in_given_bucket(_rbi);
     return _cnt;
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::contains(const key_type& _k) const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::contains(const key_type& _k) const
 -> bool {
     hash_code _c = this->_M_hash_code(_k);
     auto existed_in_given_bucket = [&](const bucket_index& _i) -> bool {
@@ -982,8 +981,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::contain
     const bucket_index _rbi = this->_M_index_in_rehash_bucket(_c);
     return existed_in_given_bucket(_bi) || existed_in_given_bucket(_rbi);
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::clear()
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::clear()
 -> void {
     // if in rehash, stop rehash force, which would destroy the data.
     if (_M_in_rehash()) { this->_M_finish_rehash(); }
@@ -999,65 +998,65 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::clear()
     this->_M_init_mark();
     this->_element_count = 0;
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::insert(const value_type& _v)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::insert(const value_type& _v)
 -> ireturn_type {
     this->_M_rehash_if_required();
 
     return this->_M_insert(_v, std::integral_constant<bool, _UniqueKey>());
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::erase(const key_type& _k)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::erase(const key_type& _k)
 -> size_t {
     this->_M_rehash_if_required();
 
     return this->_M_erase(_k, std::integral_constant<bool, _UniqueKey>());
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::operator[](const key_type& _k)
--> mapped_type& {
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::operator[](const key_type& _k)
+-> value_type& {
     hash_code _c = this->_M_hash_code(_k);
     const auto _pr = this->_M_find_node(_k, _c);
     node_type* _p = _pr.second;
     if (_p == nullptr) {
         const auto _ipr = this->_M_find_insertion_node(_c);
         _p = this->_M_allocate_node(std::piecewise_construct, std::tuple<const key_type&>(_k), std::tuple<>());
-        return _extract_value(*(this->_M_insert_unique_node(_ipr.first, _ipr.second, _c, _p)));
+        return *(this->_M_insert_unique_node(_ipr.first, _ipr.second, _c, _p));
     }
-    return _extract_value(_p->val());
+    return _p->val();
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::at(const key_type& _k)
--> mapped_type& {
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::at(const key_type& _k)
+-> value_type& {
     hash_code _c = this->_M_hash_code(_k);
     const auto _pr = this->_M_find_node(_k, _c);
     node_type* _p = _pr.second;
     if (_p == nullptr) {
         throw std::out_of_range("no such element exists");
     }
-    return _extract_value(_p->val());
+    return _p->val();
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::at(const key_type& _k) const
--> const mapped_type& {
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::at(const key_type& _k) const
+-> const value_type& {
     hash_code _c = this->_M_hash_code(_k);
     const auto _pr = this->_M_find_node(_k, _c);
     node_type* _p = _pr.second;
     if (_p == nullptr) {
         throw std::out_of_range("no such element exists");
     }
-    return _extract_value(_p->val());
+    return _p->val();
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::update(const value_type& _v)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::update(const value_type& _v)
 -> iterator {
     this->_M_rehash_if_required();
 
     return this->_M_update(_v, std::integral_constant<bool, _UniqueKey>());
 };
 
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::check() const
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::check() const
 -> int {
     /**
      * @return 0 = normal
@@ -1136,8 +1135,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::check()
 };
 
 /// rehash_policy
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_start_rehash(size_t _next_bkt)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_start_rehash(size_t _next_bkt)
 -> void {
     if (this->_M_in_rehash()) { return; }
     this->_rehash_policy._in_rehash = true;
@@ -1145,8 +1144,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_star
     _rehash_bucket_count = _next_bkt;
     _rehash_policy._cur_process = _M_index_in_bucket(_M_begin()->_hash_code);
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_finish_rehash()
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_finish_rehash()
 -> void {
     _rehash_policy._in_rehash = false;
     _rehash_policy._cur_process = _s_illegal_index;
@@ -1161,8 +1160,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_fini
     _rehash_buckets = nullptr;
     _rehash_bucket_count = 0;
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_step_rehash(size_t _step)
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_step_rehash(size_t _step)
 -> rehash_policy::status {
     if (!this->_M_in_rehash()) { return rehash_policy::status::__FAILED__; }
     if (!this->_M_valid_bucket_index(_rehash_policy._cur_process)) { return rehash_policy::status::__FAILED__; }
@@ -1213,8 +1212,8 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_step
     };
     return rehash_policy::status::__NORMAL__;
 };
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_rehash_if_required()
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_M_rehash_if_required()
 -> void {
     if (!this->_M_in_rehash()) {    
         auto _rehash_info = this->_M_need_rehash();
@@ -1238,9 +1237,9 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_M_reha
 
 
 /// constexpr static const member
-template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc>
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _Hash, typename _Alloc>
 constexpr const rehash_policy::bucket_index
-hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::_s_illegal_index
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _Hash, _Alloc>::_s_illegal_index
  = bucket_index(-1, 0);
 
 };
