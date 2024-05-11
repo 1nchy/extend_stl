@@ -318,10 +318,13 @@ public:
     iterator find(const key_type& _k);
     const_iterator find(const key_type& _k) const;
     size_t count(const key_type& _k) const;
+    bool contains(const key_type& _k) const;
     void clear();
     ireturn_type insert(const value_type& _v);
     size_t erase(const key_type& _k);
     mapped_type& operator[](const key_type& _k);
+    mapped_type& at(const key_type& _k);
+    const mapped_type& at(const key_type& _k) const;
     iterator update(const value_type& _v);
     hash_code _M_hash_code(const key_type& _k) const { return _Hash()(_k); }
 
@@ -967,6 +970,19 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::count(c
     return _cnt;
 };
 template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::contains(const key_type& _k) const
+-> bool {
+    hash_code _c = this->_M_hash_code(_k);
+    auto existed_in_given_bucket = [&](const bucket_index& _i) -> bool {
+        if (!this->_M_valid_bucket_index(_i)) return 0;
+        node_type* _p = this->_M_find_node_in_given_bucket(_i, _k, _c);
+        return _p != nullptr;
+    };
+    const bucket_index _bi = this->_M_index_in_bucket(_c);
+    const bucket_index _rbi = this->_M_index_in_rehash_bucket(_c);
+    return existed_in_given_bucket(_bi) | existed_in_given_bucket(_rbi);
+};
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
 hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::clear()
 -> void {
     // if in rehash, stop rehash force, which would destroy the data.
@@ -1007,6 +1023,28 @@ hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::operato
         const auto _ipr = this->_M_find_insertion_node(_c);
         _p = this->_M_allocate_node(std::piecewise_construct, std::tuple<const key_type&>(_k), std::tuple<>());
         return _extract_value(*(this->_M_insert_unique_node(_ipr.first, _ipr.second, _c, _p)));
+    }
+    return _extract_value(_p->val());
+};
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::at(const key_type& _k)
+-> mapped_type& {
+    hash_code _c = this->_M_hash_code(_k);
+    const auto _pr = this->_M_find_node(_k, _c);
+    node_type* _p = _pr.second;
+    if (_p == nullptr) {
+        throw std::out_of_range("no such element exists");
+    }
+    return _extract_value(_p->val());
+};
+template <typename _Key, typename _Value, typename _ExtKey, bool _UniqueKey, typename _ExtValue, typename _Hash, typename _Alloc> auto
+hash_table<_Key, _Value, _ExtKey, _UniqueKey, _ExtValue, _Hash, _Alloc>::at(const key_type& _k) const
+-> const mapped_type& {
+    hash_code _c = this->_M_hash_code(_k);
+    const auto _pr = this->_M_find_node(_k, _c);
+    node_type* _p = _pr.second;
+    if (_p == nullptr) {
+        throw std::out_of_range("no such element exists");
     }
     return _extract_value(_p->val());
 };
